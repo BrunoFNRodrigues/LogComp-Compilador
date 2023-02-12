@@ -42,7 +42,6 @@ class Compiler():
             i+=1
 
         return res
-        
 
 if __name__ == "__main__":
     res = Compiler.calculadora(sys.argv[1])

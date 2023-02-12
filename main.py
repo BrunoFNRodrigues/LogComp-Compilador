@@ -40,7 +40,6 @@ class Compiler():
             else:
                 res += int(num[i])
             i+=1
-        
 
         return res
         

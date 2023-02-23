@@ -18,7 +18,6 @@ class Tokenizer():
         sin = re.split("[0123456789]", l)
         sin = [x for x in sin if x != '']
         if (self.position)%2:
-            print(int(self.position/2//1))
             if sin[int(self.position/2//1)] == "-":
                 self.next = Token("NEG", -1)
             else:

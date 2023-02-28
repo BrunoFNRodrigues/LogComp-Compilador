@@ -45,7 +45,11 @@ class Parser():
             a = a + b*sinal
         return a
 
-    
+    def parseTerm():
+        while 1:
+            res = Parser.parseExpression()
+        return 0
+
     def run(code):
         lexico(code)
         sintatico(code)

@@ -100,9 +100,9 @@ class Parser():
         return int(res)
 
     def run(code):
-        code = comments(code)
-        lexicon(code)
-        Parser.tokenizer = Tokenizer(code,0,Token("INT", 0))
+        line = comments(code)
+        lexicon(line)
+        Parser.tokenizer = Tokenizer(line,0,Token("INT", 0))
         return Parser.parseExpression()
 
 
@@ -115,6 +115,8 @@ def lexicon(arg):
 def comments(arg):
     if "#" in arg:
         return arg[0:arg.index("#")]
+    else:
+        return arg
 
 if __name__ == "__main__":
     res = Parser.run(sys.argv[1])

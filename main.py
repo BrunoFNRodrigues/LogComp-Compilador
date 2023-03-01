@@ -11,30 +11,6 @@ class Tokenizer():
         self.source = source
         self.position = position
         self.next = next
-
-    # def selectNext(self):
-    #     l = self.source.replace(" ", "")
-    #     num = re.split("[+-/*]", l)
-    #     sin = re.split("[0123456789]", l)
-    #     sin = [x for x in sin if x != '']
-    #     if (self.position >= len(num)+len(sin)):
-    #         self.next = Token("EOF", 0) 
-    #         return
-        
-    #     if (self.position)%2:
-    #         sinal = sin[int(self.position/2//1)]
-    #         if sinal == "-":
-    #             self.next = Token("NEG", -1)
-    #         elif sinal == "+":
-    #             self.next = Token("POS", 1)
-    #         elif sinal == "/":
-    #             self.next = Token("DIV", 1)
-    #         elif sinal == "*":
-    #             self.next = Token("MULT", 1)
-     
-    #     else:
-    #         self.next = Token("INT",int(num[int(self.position/2)]))
-    #     self.position += 1
     def selectNext(self):
 
         nums = ["0","1","2","3","4","5","6","7","8","9"]
@@ -83,10 +59,6 @@ class Tokenizer():
                     self.position += 1
         else:
             self.position += 1
-            
-
-
-
 
 class Parser():
     tokenizer = None
@@ -113,7 +85,6 @@ class Parser():
         else:
             raise Exception("Valor inicial inválido")
                     
-
     def parseExpression():
         Parser.tokenizer.selectNext()
         res = Parser.parseTerm()
@@ -129,28 +100,21 @@ class Parser():
         return int(res)
 
     def run(code):
-        lexico(code)
+        code = comments(code)
+        lexicon(code)
         Parser.tokenizer = Tokenizer(code,0,Token("INT", 0))
         return Parser.parseExpression()
 
 
-def lexico(arg):
+def lexicon(arg):
     alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " "]
     for i in arg:
         if i not in alfabeto:
             raise Exception("Invalid Argument")
-
-def sintatico(arg):   
-    if arg.strip()[0] == "+" or arg.strip()[0] == "-":
-        raise Exception("Invalid starter character")
-
-    if arg.strip()[-1] == "+" or arg.strip()[-1] == "-":
-        raise Exception("Invalid end character")
-
-    l = re.split("[+-/*]", arg)
-    for i in l:
-        if " " in i.strip():
-            raise Exception("Space between numbers")
+        
+def comments(arg):
+    if "#" in arg:
+        return arg[0:arg.index("#")]
 
 if __name__ == "__main__":
     res = Parser.run(sys.argv[1])

@@ -56,8 +56,11 @@ class Tokenizer():
                 else:
                     self.position += 1   
                     if self.position == len(self.source):
-                        self.next = Token("INT", int(self.source[start_positon:self.position].replace(" ", "")))
-                        PARSING = 0
+                        if " " in self.source[start_positon:self.position].strip():
+                            raise Exception("Space between numbers")
+                        else:
+                            self.next = Token("INT", int(self.source[start_positon:self.position].replace(" ", "")))
+                            PARSING = 0
                 
         elif self.source[self.position] in sym:
             PARSING = 1

@@ -159,6 +159,6 @@ def comments(arg):
         return arg
 
 if __name__ == "__main__":
-    #res = Parser.run(sys.argv[1])
-    res = Parser.run("(2*2")
+    res = Parser.run(sys.argv[1])
+    #res = Parser.run("1+1")
     print(res)

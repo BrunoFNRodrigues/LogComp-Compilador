@@ -12,9 +12,9 @@ class Tokenizer():
         self.position = position
         self.next = next
     def selectNext(self):
-
+        print("Token: Value:{} Type:{}".format(self.next.value, self.next.type))
         nums = ["0","1","2","3","4","5","6","7","8","9"]
-        sym = ["+","-","/","*"]
+        sym = ["+","-","/","*","(",")"]
         start_positon = self.position
         if start_positon == len(self.source):
             self.next = Token("EOF", 0)
@@ -43,17 +43,31 @@ class Tokenizer():
             while PARSING:
                 if self.source[self.position] in nums:
                     sinal = self.source[start_positon:self.position].replace(" ", "")
-                    if len(sinal) != 1:
-                        raise Exception("Too many symbols")
+                    if sinal == "-":
+                        self.next = Token("NEG", -1)
+                    elif sinal == "+":
+                        self.next = Token("POS", 1)
+                    elif sinal == "/":
+                        self.next = Token("DIV", 1)
+                    elif sinal == "*":
+                        self.next = Token("MULT", 1)
+                    elif sinal == "(":
+                        self.next = Token("OP", 0)
+                    elif sinal == ")":
+                        self.next = Token("CP", 0)
+                    PARSING = 0
+                elif self.source[self.position+1] in sym:
+                    sinal = self.source[start_positon:self.position+1]
+                    if " " in sinal.strip():
+                        raise Exception("Space between symbols")
                     else:
                         if sinal == "-":
                             self.next = Token("NEG", -1)
                         elif sinal == "+":
                             self.next = Token("POS", 1)
-                        elif sinal == "/":
-                            self.next = Token("DIV", 1)
-                        elif sinal == "*":
-                            self.next = Token("MULT", 1)
+                        else:
+                            raise Exception("Wrong symbol combination")
+                        self.position += 1
                         PARSING = 0
                 else:
                     self.position += 1
@@ -63,27 +77,38 @@ class Tokenizer():
 class Parser():
     tokenizer = None
 
-    def parseTerm():
-        if Parser.tokenizer.next.type == "INT":
+    def parseFactor():
+        if Parser.tokenizer.next.type != "CP":
             res = Parser.tokenizer.next.value
             Parser.tokenizer.selectNext()
-            while Parser.tokenizer.next.type == "MULT" or Parser.tokenizer.next.type == "DIV":
-                if Parser.tokenizer.next.type == "MULT":
-                    Parser.tokenizer.selectNext()
-                    if Parser.tokenizer.next.type == "INT":
-                        res *= Parser.tokenizer.next.value
-                    else:
-                        raise Exception("Erro sintático: sinais consecutivos")    
-                elif Parser.tokenizer.next.type == "DIV":
-                    Parser.tokenizer.selectNext()
-                    if Parser.tokenizer.next.type == "INT":
-                        res /= Parser.tokenizer.next.value
-                    else:
-                        raise Exception("Erro sintático: sinais consecutivos")  
-                Parser.tokenizer.selectNext()
+            if Parser.tokenizer.next.type == "POS":
+                res = Parser.parseFactor()
+            elif Parser.tokenizer.next.type == "NEG":
+                res = Parser.parseFactor * -1
+            elif Parser.tokenizer.next.type == "CP":
+                res = Parser.parseExpression 
             return res
         else:
             raise Exception("Valor inicial inválido")
+
+
+    def parseTerm():
+        res = Parser.parseFactor()
+        while Parser.tokenizer.next.type == "MULT" or Parser.tokenizer.next.type == "DIV":
+            if Parser.tokenizer.next.type == "MULT":
+                Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "INT":
+                    res *= Parser.tokenizer.next.value
+                else:
+                    raise Exception("Erro sintático: sinais consecutivos")    
+            elif Parser.tokenizer.next.type == "DIV":
+                Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "INT":
+                    res /= Parser.tokenizer.next.value
+                else:
+                    raise Exception("Erro sintático: sinais consecutivos")  
+            Parser.tokenizer.selectNext()
+        return res
                     
     def parseExpression():
         Parser.tokenizer.selectNext()
@@ -107,7 +132,7 @@ class Parser():
 
 
 def lexicon(arg):
-    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " "]
+    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")"]
     for i in arg:
         if i not in alfabeto:
             raise Exception("Invalid Argument")
@@ -119,5 +144,6 @@ def comments(arg):
         return arg
 
 if __name__ == "__main__":
-    res = Parser.run(sys.argv[1])
+    #res = Parser.run(sys.argv[1])
+    res = Parser.run("5+5")
     print(res)

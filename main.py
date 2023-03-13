@@ -52,8 +52,10 @@ class Tokenizer():
                         self.next = Token("MULT", 0)
                     elif sinal == "(":
                         self.next = Token("OP", 0)
+                        Parser.stack += 1
                     elif sinal == ")":
                         self.next = Token("CP", 0)
+                        Parser.stack -= 1
                     PARSING = 0   
                 elif self.source[self.position+1] in nums:
                     sinal = self.source[start_positon:self.position+1].replace(" ", "")
@@ -67,13 +69,15 @@ class Tokenizer():
                         self.next = Token("MULT", 0)
                     elif sinal == "(":
                         self.next = Token("OP", 0)
+                        Parser.stack += 1
                     elif sinal == ")":
                         self.next = Token("CP", 0)
+                        Parser.stack -= 1
                     PARSING = 0
                 elif self.source[self.position+1] in sym:
                     sinal = self.source[start_positon:self.position+1]
                     sinal2 = self.source[start_positon:self.position+2]
-                    if " " in sinal2 and not "(" in sinal2 and not ")" in sinal2:
+                    if " " in sinal2 and (not "(" in sinal2) and (not ")" in sinal2) and start_positon != 0:
                         raise Exception("Space between symbols")
                     elif (sinal2[0] == "*" or sinal2[0] == "/") and (sinal2[-1] == "*" or sinal2[-1] == "/"):
                         raise Exception("Too Many symbols")
@@ -89,8 +93,10 @@ class Tokenizer():
                         self.next = Token("MULT", 0)
                     elif sinal == "(":
                         self.next = Token("OP", 0)
+                        Parser.stack += 1
                     elif sinal == ")":
                         self.next = Token("CP", 0)
+                        Parser.stack -= 1
                     else:
                         raise Exception("Wrong symbol combination")
                     PARSING = 0
@@ -102,6 +108,8 @@ class Tokenizer():
 
 class Parser():
     tokenizer = None
+    stack = 0
+    
     def parseFactor():
         if Parser.tokenizer.next.type != "CP":
             res = Parser.tokenizer.next.value
@@ -126,17 +134,16 @@ class Parser():
         while Parser.tokenizer.next.type == "MULT" or Parser.tokenizer.next.type == "DIV":
             if Parser.tokenizer.next.type == "MULT":
                 Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "EOF":
+                    raise Exception("* no fim")
                 res *= Parser.parseFactor()
-                # if Parser.tokenizer.next.type == "INT":
-                #     res *= Parser.tokenizer.next.value
-                # else:
-                #     raise Exception("Erro sintático: sinais consecutivos")    
+                   
             elif Parser.tokenizer.next.type == "DIV":
                 Parser.tokenizer.selectNext()
-                if Parser.tokenizer.next.type == "INT":
-                    res /= Parser.tokenizer.next.value
-                # else:
-                #     raise Exception("Erro sintático: sinais consecutivos")  
+                if Parser.tokenizer.next.type == "EOF":
+                    raise Exception("* no fim")
+                res /= Parser.parseFactor()
+                
             Parser.tokenizer.selectNext()
         return res
                     
@@ -146,11 +153,19 @@ class Parser():
         while Parser.tokenizer.next.type == "POS" or Parser.tokenizer.next.type == "NEG":
             if Parser.tokenizer.next.type == "POS":
                 Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "EOF":
+                    raise Exception("+ no fim")
                 res += Parser.parseTerm()
+                
                   
             elif Parser.tokenizer.next.type == "NEG":
                 Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "EOF":
+                    raise Exception("- no fim")
                 res -= Parser.parseTerm()
+        
+        if Parser.stack != 0:
+            raise Exception("Faltou parenteses")
         
         return int(res)
 
@@ -176,6 +191,6 @@ def comments(arg):
         return arg
 
 if __name__ == "__main__":
-    res = Parser.run(sys.argv[1])
-    #res = Parser.run("(1+1*2+2)")
+    #res = Parser.run(sys.argv[1])
+    res = Parser.run("1 + #* A */ */")
     print(res)

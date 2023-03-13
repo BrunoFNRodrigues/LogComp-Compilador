@@ -113,7 +113,6 @@ class Parser():
                 res *= Parser.parseFactor()
             elif Parser.tokenizer.next.type == "OP":
                 res = Parser.parseExpression()
-                print("Voltou dos parentese")
                 if Parser.tokenizer.next.type != "CP":
                     raise Exception("Faltou fechar")
             return res

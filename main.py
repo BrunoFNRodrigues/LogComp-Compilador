@@ -164,16 +164,16 @@ class Parser():
                     raise Exception("- no fim")
                 res -= Parser.parseTerm()
         
-        if Parser.stack != 0:
-            raise Exception("Faltou parenteses")
-        
         return int(res)
 
     def run(code):
         line = comments(code).strip()
         lexicon(line)
         Parser.tokenizer = Tokenizer(line,0,Token("INT", 0))
-        return Parser.parseExpression()
+        res = Parser.parseExpression()
+        if Parser.stack != 0:
+            raise Exception("Faltou parenteses")
+        return res
 
 
 def lexicon(arg):
@@ -192,5 +192,5 @@ def comments(arg):
 
 if __name__ == "__main__":
     res = Parser.run(sys.argv[1])
-    #res = Parser.run("100 + 100")
+    #res = Parser.run("((10*(9*9)))")
     print(res)

@@ -198,8 +198,8 @@ class BinOp(Node):
 class UnOp(Node):
     def Evaluate(self):
         if self.value == "-":
-            return -self.children[0].Evaluate()
-        return self.children[0].Evaluate()
+            return -self.children.Evaluate()
+        return self.children.Evaluate()
         
 class IntVal(Node):
     def Evaluate(self):

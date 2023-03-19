@@ -112,13 +112,14 @@ class Parser():
     
     def parseFactor():
         if Parser.tokenizer.next.type != "CP":
-            res = Parser.tokenizer.next.value
-            if Parser.tokenizer.next.type == "POS":
+            if Parser.tokenizer.next.type == "INT":
+                res = IntVal(Parser.tokenizer.next.value, [])
+            elif Parser.tokenizer.next.type == "POS":
                 Parser.tokenizer.selectNext()
-                res *= Parser.parseFactor()
+                res = UnOp("+", Parser.parseFactor())
             elif Parser.tokenizer.next.type == "NEG":
                 Parser.tokenizer.selectNext()
-                res *= Parser.parseFactor()
+                res = UnOp("-", Parser.parseFactor())
             elif Parser.tokenizer.next.type == "OP":
                 res = Parser.parseExpression()
                 if Parser.tokenizer.next.type != "CP":
@@ -136,14 +137,14 @@ class Parser():
                 Parser.tokenizer.selectNext()
                 if Parser.tokenizer.next.type == "EOF":
                     raise Exception("* no fim")
-                res *= Parser.parseFactor()
+                res = BinOp("*", [Parser.parseFactor(), res])
                    
             elif Parser.tokenizer.next.type == "DIV":
                 Parser.tokenizer.selectNext()
                 if Parser.tokenizer.next.type == "EOF":
                     raise Exception("* no fim")
-                res /= Parser.parseFactor()
-                
+                res = BinOp("/", [Parser.parseFactor(), res])
+
             Parser.tokenizer.selectNext()
         return res
                     
@@ -155,16 +156,16 @@ class Parser():
                 Parser.tokenizer.selectNext()
                 if Parser.tokenizer.next.type == "EOF":
                     raise Exception("+ no fim")
-                res += Parser.parseTerm()
+                res = BinOp("+", [Parser.parseTerm(), res])
                 
                   
             elif Parser.tokenizer.next.type == "NEG":
                 Parser.tokenizer.selectNext()
                 if Parser.tokenizer.next.type == "EOF":
                     raise Exception("- no fim")
-                res -= Parser.parseTerm()
+                res = BinOp("-", [Parser.parseTerm(), res])
         
-        return int(res)
+        return res
 
     def run(code):
         line = comments(code).strip()
@@ -224,5 +225,6 @@ def comments(arg):
 
 if __name__ == "__main__":
     res = Parser.run(sys.argv[1])
+    res = int(res.Evaluate())
     #res = Parser.run("((10*(9*9)))")
     print(res)

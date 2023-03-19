@@ -224,7 +224,8 @@ def comments(arg):
         return arg
 
 if __name__ == "__main__":
-    res = Parser.run(sys.argv[1])
-    res = int(res.Evaluate())
-    #res = Parser.run("((10*(9*9)))")
-    print(res)
+    with open(sys.argv[1], "r") as f: 
+        res = Parser.run(f.readline())
+        res = int(res.Evaluate())
+        #res = Parser.run("((10*(9*9)))")
+        print(res)

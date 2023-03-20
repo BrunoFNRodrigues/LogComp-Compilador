@@ -33,3 +33,16 @@ class IntVal(Node):
 class NoOp(Node):
     def Evaluate():
         return None
+
+class Iden(Node):
+    def Evaluate(self):
+        return SymbolTable.getter(self.value)
+    
+class Block(Node):
+    def Evaluate():
+        pass
+
+class Print(Node):
+    def Evaluate(self):
+        print(self.children.Evaluate())
+        return

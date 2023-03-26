@@ -23,8 +23,8 @@ class BinOp(Node):
 class UnOp(Node):
     def Evaluate(self):
         if self.value == "-":
-            return -self.children[0].Evaluate()
-        return self.children[0].Evaluate()
+            return -self.children.Evaluate()
+        return self.children.Evaluate()
         
 class IntVal(Node):
     def Evaluate(self):
@@ -45,7 +45,7 @@ class Block(Node):
 
 class Print(Node):
     def Evaluate(self):
-        print(self.children.Evaluate())
+        print(int(self.children.Evaluate()))
 
 class Assigment(Node):
     def Evaluate(self):

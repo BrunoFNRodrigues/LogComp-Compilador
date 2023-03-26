@@ -91,7 +91,7 @@ class Tokenizer():
                 
             while PARSING:                    
                 self.position += 1
-                if self.source[self.position] in letters:
+                if self.source[self.position] in letters+["\n"]:
                     value = self.source[start_positon:self.position]
                     if " " in value.strip():
                         raise Exception("Variavel invalida")

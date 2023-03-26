@@ -31,7 +31,7 @@ class IntVal(Node):
         return self.value
     
 class NoOp(Node):
-    def Evaluate():
+    def Evaluate(self):
         return None
 
 class Identifier(Node):

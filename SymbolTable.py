@@ -4,7 +4,7 @@ class SymbolTable():
     reserved = ["println"]
         
     def Getter(key):
-        if key in reversed:
+        if key in SymbolTable.reserved:
             raise Exception("Palavra reservada")
         if key in SymbolTable.table.keys():
             return SymbolTable.table[key]

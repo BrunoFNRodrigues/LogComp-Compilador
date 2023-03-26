@@ -27,7 +27,7 @@ class Tokenizer():
         elif self.source[self.position] in nums:
             PARSING = 1
             while PARSING:
-                if self.source[self.position] in list(sym.keys())+["\\"]:
+                if self.source[self.position] in list(sym.keys()) or self.source[self.position:self.position+1] == "\n":
                     value = self.source[start_positon:self.position]
                     if " " in value.strip():
                         raise Exception("Space between numbers")
@@ -45,13 +45,8 @@ class Tokenizer():
                 
         elif self.source[self.position] in list(sym.keys()):
             PARSING = 1
-            while PARSING:
-                if self.position+1 == len(self.source):
-                    sinal = self.source[self.position]
-                    self.next = Token(sym[sinal], 0)
-                    PARSING = 0 
-                      
-                elif self.source[self.position+1] in nums+letters:
+            while PARSING:        
+                if self.source[self.position+1] in nums+letters+["\n"]:
                     sinal = self.source[start_positon:self.position+1].replace(" ", "")
                     self.next = Token(sym[sinal], 0)
                     PARSING = 0
@@ -75,7 +70,7 @@ class Tokenizer():
             PARSING = 1
             while PARSING:
                 self.position += 1
-                if self.source[self.position] in list(sym.keys())+["\\","="]:
+                if self.source[self.position] in list(sym.keys())+["="] or self.source[self.position:self.position+1] == "\n":
                     value = self.source[start_positon:self.position].strip()
                     if " " in value:
                         raise Exception("Variavel invalida")
@@ -86,16 +81,23 @@ class Tokenizer():
                     
                     PARSING = 0 
                 
-        elif self.source[self.position] == "\\":
+        elif self.source[self.position:self.position+1] == "\n":
             PARSING = 1
-            while PARSING:
+            if self.position+1 >= len(self.source):
+                value = self.source[self.position]
+                self.next = Token("LB", value.strip())
+                PARSING = 0 
+                self.position += 1
+                
+            while PARSING:                    
+                self.position += 1
                 if self.source[self.position] in letters:
-                    value = self.source[start_positon:self.position+1]
+                    value = self.source[start_positon:self.position]
                     if " " in value.strip():
                         raise Exception("Variavel invalida")
                     self.next = Token("LB", value.strip())
                     PARSING = 0 
-                self.position += 1
+
         
         elif self.source[self.position] == "=":
             PARSING = 1

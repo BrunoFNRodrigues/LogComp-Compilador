@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from SymbolTable import SymbolTable
 
 class Node(ABC):
-    def __init__(self, value=None, children=None):
+    def __init__(self, value=0, children=[]):
         self.value = value
         self.children = children
 
@@ -49,5 +49,5 @@ class Print(Node):
 
 class Assigment(Node):
     def Evaluate(self):
-        SymbolTable.Setter(self.children[0].value, self.children[1].Evaluete())
+        SymbolTable.Setter(self.children[0].value, self.children[1].Evaluate())
     

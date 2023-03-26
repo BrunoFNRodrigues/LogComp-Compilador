@@ -102,7 +102,7 @@ class Parser():
         return res
 
 def lexicon(arg):
-    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n"] + list(string.ascii_letters) + list(string.punctuation)
+    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n", "_"] + list(string.ascii_letters)
     if len(arg) == 0:
         raise Exception("No Argument")
     for i in arg:
@@ -130,3 +130,7 @@ if __name__ == "__main__":
     with open(sys.argv[1], "r") as f: 
         res = Parser.run(f.read())
         res = res.Evaluate()
+# if __name__ == "__main__":
+#     with open("test.txt", "r") as f: 
+#         res = Parser.run(f.read())
+#         res = res.Evaluate()

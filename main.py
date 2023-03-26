@@ -95,7 +95,7 @@ class Parser():
         return res
 
     def run(code):
-        line = comments(code)
+        line = comments(code).lstrip()
         lexicon(line)
         Parser.tokenizer = Tokenizer(line,0,Token("INT", 0))
         res = Parser.parseBlock()

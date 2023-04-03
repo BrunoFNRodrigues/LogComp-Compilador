@@ -23,7 +23,7 @@ class Parser():
             Parser.tokenizer.selectNext()
             if Parser.tokenizer.next.type == "EQL":
                 Parser.tokenizer.selectNext()
-                res = Assigment(children=[res, Parser.parseExpression()])
+                res = Assignment(children=[res, Parser.parseExpression()])
                 if Parser.tokenizer.next.type == "LB":
                     return res
         if Parser.tokenizer.next.type == "PNT":

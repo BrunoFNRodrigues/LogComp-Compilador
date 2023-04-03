@@ -47,7 +47,7 @@ class Print(Node):
     def Evaluate(self):
         print(int(self.children.Evaluate()))
 
-class Assigment(Node):
+class Assignment(Node):
     def Evaluate(self):
         SymbolTable.Setter(self.children[0].value, self.children[1].Evaluate())
     

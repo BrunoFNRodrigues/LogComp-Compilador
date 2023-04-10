@@ -18,7 +18,18 @@ class BinOp(Node):
             return self.children[1].Evaluate()+self.children[0].Evaluate()
         elif self.value == "*":
             return self.children[1].Evaluate()*self.children[0].Evaluate()
-        return self.children[1].Evaluate()/self.children[0].Evaluate()
+        elif self.value == "/":
+            return self.children[1].Evaluate()/self.children[0].Evaluate()
+        elif self.value == "==":
+            return self.children[1].Evaluate() == self.children[0].Evaluate()
+        elif self.value == ">":
+            return self.children[1].Evaluate()>self.children[0].Evaluate()
+        elif self.value == "<":
+            return self.children[1].Evaluate()<self.children[0].Evaluate()
+        elif self.value == "||":
+            return self.children[1].Evaluate() or self.children[0].Evaluate()
+        elif self.value == "&&":
+            return self.children[1].Evaluate() and self.children[0].Evaluate()
 
 class UnOp(Node):
     def Evaluate(self):
@@ -51,3 +62,18 @@ class Assignment(Node):
     def Evaluate(self):
         SymbolTable.Setter(self.children[0].value, self.children[1].Evaluate())
     
+class Read(Node):
+    def Evaluate(self):
+        return int(input())
+    
+class While(Node):
+    def Evaluate(self):
+        while self.children[1].Evaluate():
+            self.children[0].Evaluate()
+
+class If(Node):
+    def Evaluate(self):
+        if self.children[-1]:
+            self.children[-2].Evaluate()
+        elif len(self.children) > 2:
+            self.children[0].Evaluate()

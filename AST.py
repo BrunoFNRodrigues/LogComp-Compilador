@@ -35,7 +35,15 @@ class UnOp(Node):
     def Evaluate(self):
         if self.value == "-":
             return -self.children.Evaluate()
-        return self.children.Evaluate()
+        if self.value == "+":
+            return self.children.Evaluate()
+        if self.value == "!":
+            resultado=1
+            count=1
+            while count <= self.children.Evaluate():
+                resultado *= count
+                count += 1
+            return resultado
         
 class IntVal(Node):
     def Evaluate(self):

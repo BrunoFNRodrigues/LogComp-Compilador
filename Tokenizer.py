@@ -40,21 +40,22 @@ class Tokenizer():
                         else:
                             self.next = Token("INT", int(self.source[start_positon:self.position].replace(" ", "")))
                             PARSING = 0
-                
+           
+        elif self.source[self.position:self.position+2] in list(sym.keys()):
+            if not " " in self.source[start_positon:self.position+2]:
+                self.next = Token(sym[self.source[self.position:self.position+2]], 0)
+                self.position += 2
+                PARSING = 0
+                         
         elif self.source[self.position] in list(sym.keys()):
             PARSING = 1
             while PARSING:        
-                if self.source[self.position+1] in nums+letters+["\n"]:
+                if self.source[self.position+1] in nums+letters+["\n", " "]:
                     sinal = self.source[start_positon:self.position+1].replace(" ", "")
                     self.next = Token(sym[sinal], 0)
                     PARSING = 0
-                    
-                elif self.source[self.position:self.position+2] in list(sym.keys()):
-                    if not " " in self.source[self.position:self.position+2]:
-                        self.next = Token(sym[self.source[self.position:self.position+2]], 0)
-                        self.position += 2
-                        PARSING = 0
-                        
+                
+       
                 elif self.source[self.position+1] in list(sym.keys())+letters:
                     sinal = self.source[start_positon:self.position+1]
                     sinal2 = self.source[start_positon:self.position+2]
@@ -105,3 +106,6 @@ class Tokenizer():
         else:
             self.position += 1
             self.selectNext()
+            
+        #print("Type: {} Value: {}".format(self.next.type, self.next.value))
+

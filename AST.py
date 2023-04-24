@@ -7,11 +7,13 @@ class Node(ABC):
         self.children = children
 
     @abstractmethod
-    def Evaluate():
+    def Evaluate(self):
         None
 
 class BinOp(Node):
     def Evaluate(self):
+        if self.children[0].Evaluate()[0] != "Int" or self.children[1].Evaluate()[0] != "Int":
+            raise Exception("BinOP precisa que"+self.children[0].Evaluate()[0]+"="+self.children[1].Evaluate()[0])
         if self.value == "-":
             return self.children[1].Evaluate()-self.children[0].Evaluate()
         elif self.value == "+":
@@ -33,22 +35,32 @@ class BinOp(Node):
 
 class UnOp(Node):
     def Evaluate(self):
+        if self.children.Evaluate()[0] != "Int":
+            raise Exception("UnOP não aceita"+self.children.Evaluate()[0])
         if self.value == "-":
-            return -self.children.Evaluate()
+            return ("Int", -self.children.Evaluate())
         if self.value == "+":
-            return self.children.Evaluate()
+            return ("Int", self.children.Evaluate())
         if self.value == "!":
             resultado=1
             count=1
             while count <= self.children.Evaluate():
                 resultado *= count
                 count += 1
-            return resultado
-        
+            return ("Int", resultado)
+
+class ConcatOp(Node):
+    def Evaluate(self):
+        return ("Str" ,str(self.children[0].Evaluate()[1]) + str(self.children[1].Evaluate()[0]))
+
 class IntVal(Node):
     def Evaluate(self):
-        return self.value
-    
+        return ("Int", self.value)
+
+class StringVal(Node):
+    def Evaluate(self):
+        return ("Str", self.value)
+
 class NoOp(Node):
     def Evaluate(self):
         return None
@@ -85,3 +97,8 @@ class If(Node):
             self.children[-2].Evaluate()
         elif len(self.children) > 2:
             self.children[0].Evaluate()
+
+class VarDec(Node):
+    def Evaluate(self):
+        SymbolTable.Create(self.children[0].value, self.children[1].Evaluate())
+        

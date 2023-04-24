@@ -81,7 +81,7 @@ class While(Node):
 
 class If(Node):
     def Evaluate(self):
-        if self.children[-1]:
+        if self.children[-1].Evaluate():
             self.children[-2].Evaluate()
         elif len(self.children) > 2:
             self.children[0].Evaluate()

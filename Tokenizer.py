@@ -16,7 +16,7 @@ class Tokenizer():
                "*":"MULT", "(":"OP", ")":"CP",
                "||":"OR", "&&":"AND", "=": "EQL", "==":"SEQL",
                ">":"GRT", "<":"LST", "!" : "FTR"}
-        reserved = {"println":"PNT", "readln":"RD", "while":"WHL", "if":"IF", "else":"ELSE", "end":"END"}
+        reserved = {"println":"PNT", "readline":"RD", "while":"WHL", "if":"IF", "else":"ELSE", "end":"END"}
         letters= list(string.ascii_letters)
         start_positon = self.position
         if start_positon == len(self.source):

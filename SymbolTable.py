@@ -1,7 +1,7 @@
 
 class SymbolTable():
     table = {}
-    reserved = ["println", "while", "if", "else"]
+    reserved = ["println", "readline", "while", "if", "else"]
         
     def Getter(key):
         if key in SymbolTable.reserved:

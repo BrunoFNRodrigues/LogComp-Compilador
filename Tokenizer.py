@@ -107,5 +107,5 @@ class Tokenizer():
             self.position += 1
             self.selectNext()
             
-        #print("Type: {} Value: {}".format(self.next.type, self.next.value))
+        
 

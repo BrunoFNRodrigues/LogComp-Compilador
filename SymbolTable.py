@@ -11,4 +11,13 @@ class SymbolTable():
         raise Exception("Variável não incializada")
     
     def Setter(key, value):
+        if value[0] != SymbolTable.table[key][0]:
+            raise Exception("Tipo não combina"+value[0]+"!="+SymbolTable.table[key][0]) 
         SymbolTable.table[key] = value
+
+    def Create(key, value):
+        if key in SymbolTable.table.keys():
+            raise Exception("Variavel já existe")
+        else:
+            SymbolTable.table[key] = value
+

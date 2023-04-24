@@ -7,6 +7,14 @@ class Parser():
     tokenizer = None
     stack = 0
     
+    def parseMainBlock():
+        Parser.tokenizer.selectNext()
+        statements = []
+        while Parser.tokenizer.next.type != "EOF":
+            statements.append(Parser.parseStatement())
+            Parser.tokenizer.selectNext()
+        return Block(children=statements)
+    
     def parseBlock():
         Parser.tokenizer.selectNext()
         statements = []
@@ -18,7 +26,7 @@ class Parser():
     def parseStatement():
         if Parser.tokenizer.next.type == "LB":
             return NoOp()
-        if Parser.tokenizer.next.type == "IDT":
+        elif Parser.tokenizer.next.type == "IDT":
             res = Identifier(Parser.tokenizer.next.value)
             Parser.tokenizer.selectNext()
             if Parser.tokenizer.next.type == "EQL":
@@ -27,7 +35,7 @@ class Parser():
                 if Parser.tokenizer.next.type == "LB":
                     return res
         
-        if Parser.tokenizer.next.type == "PNT":
+        elif Parser.tokenizer.next.type == "PNT":
             Parser.tokenizer.selectNext()
             if Parser.tokenizer.next.type == "OP":
                 Parser.tokenizer.selectNext()
@@ -37,7 +45,7 @@ class Parser():
                     if Parser.tokenizer.next.type == "LB":
                         return res
                     
-        if Parser.tokenizer.next.type == "WHL":
+        elif Parser.tokenizer.next.type == "WHL":
             Parser.tokenizer.selectNext()
             res = Parser.parseRelExpression()
             if Parser.tokenizer.next.type == "LB":
@@ -47,7 +55,7 @@ class Parser():
                     if Parser.tokenizer.next.type == "LB":
                         return res
                     
-        if Parser.tokenizer.next.type == "IF":
+        elif Parser.tokenizer.next.type == "IF":
             Parser.tokenizer.selectNext()
             res = Parser.parseRelExpression()
             if Parser.tokenizer.next.type == "LB":
@@ -59,12 +67,17 @@ class Parser():
                     Parser.tokenizer.selectNext()
                     if Parser.tokenizer.next.type == "LB":
                         block2 = Parser.parseBlock()
-                        res = If("If", [block2, block1, res])  
-                        Parser.tokenizer.selectNext()
+                        res = If("If", [block2, block1, res])
+                        if Parser.tokenizer.next.type == "END":
+                            Parser.tokenizer.selectNext()
+                        else:
+                            raise Exception("Else problem")
+                        
                 if Parser.tokenizer.next.type == "LB":
                     return res    
-
-                    
+        
+        else:
+            raise Exception("Bad Statement")
                         
     def parseFactor():
         if Parser.tokenizer.next.type != "CP":
@@ -88,11 +101,13 @@ class Parser():
                 if Parser.tokenizer.next.type != "CP":
                     raise Exception("Faltou fechar")
             elif Parser.tokenizer.next.type == "RD":
+                res = Read()
+                Parser.tokenizer.selectNext()
                 if Parser.tokenizer.next.type == "OP":
                     Parser.tokenizer.selectNext()
                     if Parser.tokenizer.next.type != "CP":
                         raise Exception("Faltou fechar")
-     
+
             return res
         else:
             raise Exception("CP No lugar errado")
@@ -172,11 +187,11 @@ class Parser():
         line = comments(code).lstrip()
         lexicon(line)
         Parser.tokenizer = Tokenizer(line,0,Token("INT", 0))
-        res = Parser.parseBlock()
+        res = Parser.parseMainBlock()
         return res
 
 def lexicon(arg):
-    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n", "_", "|", "&", "<", ">"] + list(string.ascii_letters)
+    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n", "_", "|", "&", "<", ">", "!"] + list(string.ascii_letters)
     if len(arg) == 0:
         raise Exception("No Argument")
     for i in arg:
@@ -200,11 +215,11 @@ def comments(arg):
         
     return arg
 
-if __name__ == "__main__":
-    with open(sys.argv[1], "r") as f: 
-        res = Parser.run(f.read())
-        res = res.Evaluate()
 # if __name__ == "__main__":
-#     with open("exemplo.jl", "r") as f: 
+#     with open(sys.argv[1], "r") as f: 
 #         res = Parser.run(f.read())
 #         res = res.Evaluate()
+if __name__ == "__main__":
+    with open("exemplo.jl", "r") as f: 
+        res = Parser.run(f.read())
+        res = res.Evaluate()

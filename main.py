@@ -215,11 +215,11 @@ def comments(arg):
         
     return arg
 
-# if __name__ == "__main__":
-#     with open(sys.argv[1], "r") as f: 
-#         res = Parser.run(f.read())
-#         res = res.Evaluate()
 if __name__ == "__main__":
-    with open("exemplo.jl", "r") as f: 
+    with open(sys.argv[1], "r") as f: 
         res = Parser.run(f.read())
         res = res.Evaluate()
+# if __name__ == "__main__":
+#     with open("exemplo.jl", "r") as f: 
+#         res = Parser.run(f.read())
+#         res = res.Evaluate()

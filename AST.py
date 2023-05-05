@@ -15,23 +15,24 @@ class BinOp(Node):
         if self.children[0].Evaluate()[0] != "Int" or self.children[1].Evaluate()[0] != "Int":
             raise Exception("BinOP precisa que"+self.children[0].Evaluate()[0]+"="+self.children[1].Evaluate()[0])
         if self.value == "-":
-            return self.children[1].Evaluate()-self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1]-self.children[0].Evaluate()[1]
         elif self.value == "+":
-            return self.children[1].Evaluate()+self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1]+self.children[0].Evaluate()[1]
         elif self.value == "*":
-            return self.children[1].Evaluate()*self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1]*self.children[0].Evaluate()[1]
         elif self.value == "/":
-            return self.children[1].Evaluate()/self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1]/self.children[0].Evaluate()[1]
         elif self.value == "==":
-            return self.children[1].Evaluate() == self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1] == self.children[0].Evaluate()[1]
         elif self.value == ">":
-            return self.children[1].Evaluate()>self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1]>self.children[0].Evaluate()[1]
         elif self.value == "<":
-            return self.children[1].Evaluate()<self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1]<self.children[0].Evaluate()[1]
         elif self.value == "||":
-            return self.children[1].Evaluate() or self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1] or self.children[0].Evaluate()[1]
         elif self.value == "&&":
-            return self.children[1].Evaluate() and self.children[0].Evaluate()
+            res = self.children[1].Evaluate()[1] and self.children[0].Evaluate()[1]
+        return ("Int", res)
 
 class UnOp(Node):
     def Evaluate(self):
@@ -51,7 +52,7 @@ class UnOp(Node):
 
 class ConcatOp(Node):
     def Evaluate(self):
-        return ("Str" ,str(self.children[0].Evaluate()[1]) + str(self.children[1].Evaluate()[0]))
+        return ("Str" ,str(self.children[0].Evaluate()[1]) + str(self.children[1].Evaluate()[1]))
 
 class IntVal(Node):
     def Evaluate(self):
@@ -84,7 +85,7 @@ class Assignment(Node):
     
 class Read(Node):
     def Evaluate(self):
-        return int(input())
+        return ("Int", int(input()))
     
 class While(Node):
     def Evaluate(self):

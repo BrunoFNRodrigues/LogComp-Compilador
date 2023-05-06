@@ -12,8 +12,8 @@ class Node(ABC):
 
 class BinOp(Node):
     def Evaluate(self):
-        if self.children[0].Evaluate()[0] != "Int" or self.children[1].Evaluate()[0] != "Int":
-            raise Exception("BinOP precisa que"+self.children[0].Evaluate()[0]+"="+self.children[1].Evaluate()[0])
+        if self.children[0].Evaluate()[0] != self.children[1].Evaluate()[0]:
+            raise Exception("BinOP precisa que"+self.children[1].Evaluate()[0]+"="+self.children[0].Evaluate()[0])
         if self.value == "-":
             res = self.children[1].Evaluate()[1]-self.children[0].Evaluate()[1]
         elif self.value == "+":
@@ -32,7 +32,7 @@ class BinOp(Node):
             res = self.children[1].Evaluate()[1] or self.children[0].Evaluate()[1]
         elif self.value == "&&":
             res = self.children[1].Evaluate()[1] and self.children[0].Evaluate()[1]
-        return ("Int", res)
+        return ("Int", int(res))
 
 class UnOp(Node):
     def Evaluate(self):
@@ -52,7 +52,7 @@ class UnOp(Node):
 
 class ConcatOp(Node):
     def Evaluate(self):
-        return ("Str" ,str(self.children[0].Evaluate()[1]) + str(self.children[1].Evaluate()[1]))
+        return ("String" ,str(self.children[1].Evaluate()[1]) + str(self.children[0].Evaluate()[1]))
 
 class IntVal(Node):
     def Evaluate(self):
@@ -60,7 +60,7 @@ class IntVal(Node):
 
 class StringVal(Node):
     def Evaluate(self):
-        return ("Str", self.value)
+        return ("String", self.value)
 
 class NoOp(Node):
     def Evaluate(self):
@@ -77,7 +77,7 @@ class Block(Node):
 
 class Print(Node):
     def Evaluate(self):
-        print(int(self.children.Evaluate()))
+            print(self.children.Evaluate()[1])
 
 class Assignment(Node):
     def Evaluate(self):
@@ -101,5 +101,11 @@ class If(Node):
 
 class VarDec(Node):
     def Evaluate(self):
-        SymbolTable.Create(self.children[0].value, self.children[1].Evaluate())
+        if len(self.children) <= 1:
+            if self.value == "Int":
+                SymbolTable.Create(self.children[0].value,["Int", 0])
+            elif self.value == "String":
+                SymbolTable.Create(self.children[0].value, ["String", ""])
+        else:
+            SymbolTable.Create(self.children[0].value, self.children[1].Evaluate())
         

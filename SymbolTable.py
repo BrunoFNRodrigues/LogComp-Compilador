@@ -8,11 +8,10 @@ class SymbolTable():
             raise Exception("Palavra reservada")
         if key in SymbolTable.table.keys():
             return SymbolTable.table[key]
-        raise Exception("Variável não incializada")
     
     def Setter(key, value):
         if value[0] != SymbolTable.table[key][0]:
-            raise Exception("Tipo não combina"+value[0]+"!="+SymbolTable.table[key][0]) 
+            raise Exception("Tipo não combina: "+value[0]+"!="+SymbolTable.table[key][0]) 
         SymbolTable.table[key] = value
 
     def Create(key, value):

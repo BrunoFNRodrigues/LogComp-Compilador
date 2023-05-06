@@ -34,6 +34,18 @@ class Parser():
                 res = Assignment(children=[res, Parser.parseRelExpression()])
                 if Parser.tokenizer.next.type == "LB":
                     return res
+            elif Parser.tokenizer.next.type == "TYPO":
+                Parser.tokenizer.selectNext()
+                t =  Parser.tokenizer.next.value
+                Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "EQL":
+                    Parser.tokenizer.selectNext()
+                    res = VarDec(t, [res, Parser.parseRelExpression()])
+                    if  Parser.tokenizer.next.type == "LB":
+                        return res                    
+                elif Parser.tokenizer.next.type == "LB":
+                    res = VarDec(t, [res])
+                    return res
         
         elif Parser.tokenizer.next.type == "PNT":
             Parser.tokenizer.selectNext()
@@ -77,7 +89,7 @@ class Parser():
                     return res    
         
         else:
-            raise Exception("Bad Statement")
+            raise Exception("Bad Statement"+ Parser.tokenizer.next.type)
                         
     def parseFactor():
         if Parser.tokenizer.next.type != "CP":
@@ -106,7 +118,13 @@ class Parser():
                 if Parser.tokenizer.next.type == "OP":
                     Parser.tokenizer.selectNext()
                     if Parser.tokenizer.next.type != "CP":
-                        raise Exception("Faltou fechar")
+                        raise Exception("Faltou fechar parenteses")
+            elif Parser.tokenizer.next.type == "COT":
+                Parser.tokenizer.selectNext()
+                res = StringVal(Parser.tokenizer.next.value, [])
+                Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type != "COT":
+                    raise Exception("Faltou fechar aspas")
 
             return res
         else:
@@ -162,7 +180,7 @@ class Parser():
 
     def parseRelExpression():
         res = Parser.parseExpression()
-        while Parser.tokenizer.next.type == "SEQL" or Parser.tokenizer.next.type == "GRT" or Parser.tokenizer.next.type == "LST":
+        while Parser.tokenizer.next.type == "SEQL" or Parser.tokenizer.next.type == "GRT" or Parser.tokenizer.next.type == "LST" or Parser.tokenizer.next.type == "CONCAT":
             if Parser.tokenizer.next.type == "SEQL":
                 Parser.tokenizer.selectNext()
                 if Parser.tokenizer.next.type == "EOF":
@@ -181,7 +199,14 @@ class Parser():
                 if Parser.tokenizer.next.type == "EOF":
                     raise Exception("< no fim")
                 res = BinOp("<", [Parser.parseExpression(), res])
+                
+            elif Parser.tokenizer.next.type == "CONCAT":
+                Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "EOF":
+                    raise Exception(". no fim")
+                res = ConcatOp(".", [Parser.parseExpression(), res])
         return res
+
 
     def run(code):
         line = comments(code).lstrip()
@@ -191,7 +216,7 @@ class Parser():
         return res
 
 def lexicon(arg):
-    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n", "_", "|", "&", "<", ">", "!"] + list(string.ascii_letters)
+    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n", "_", "|", "&", "<", ">", "!", ".", ":", '"'] + list(string.ascii_letters)
     if len(arg) == 0:
         raise Exception("No Argument")
     for i in arg:
@@ -215,11 +240,12 @@ def comments(arg):
         
     return arg
 
-if __name__ == "__main__":
-    with open(sys.argv[1], "r") as f: 
-        res = Parser.run(f.read())
-        res = res.Evaluate()
 # if __name__ == "__main__":
-#     with open("exemplo.jl", "r") as f: 
+#     with open(sys.argv[1], "r") as f: 
 #         res = Parser.run(f.read())
 #         res = res.Evaluate()
+        
+if __name__ == "__main__":
+    with open("testes/test1.jl", "r") as f: 
+        res = Parser.run(f.read())
+        res = res.Evaluate()

@@ -4,7 +4,7 @@ from main import comments
 
 
 
-with open("exemplo.jl", "r") as f: 
+with open("testes/test0.jl", "r") as f: 
     line = comments(f.read())
     t = Tokenizer(line,0,Token("INT", 0))
 

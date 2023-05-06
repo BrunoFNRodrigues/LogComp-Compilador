@@ -15,8 +15,8 @@ class Tokenizer():
         sym = {"+":"POS", "-":"NEG", "/":"DIV", 
                "*":"MULT", "(":"OP", ")":"CP",
                "||":"OR", "&&":"AND", "=": "EQL", "==":"SEQL",
-               ">":"GRT", "<":"LST", "!" : "FTR"}
-        reserved = {"println":"PNT", "readline":"RD", "while":"WHL", "if":"IF", "else":"ELSE", "end":"END"}
+               ">":"GRT", "<":"LST", "!" : "FTR", ".":"CONCAT", "::":"TYPO", '"':"COT"}
+        reserved = {"println":"PNT", "readline":"RD", "while":"WHL", "if":"IF", "else":"ELSE", "end":"END", "String":"STR", "Int":"INT"}
         letters= list(string.ascii_letters)
         start_positon = self.position
         if start_positon == len(self.source):
@@ -43,7 +43,7 @@ class Tokenizer():
            
         elif self.source[self.position:self.position+2] in list(sym.keys()):
             if not " " in self.source[start_positon:self.position+2]:
-                self.next = Token(sym[self.source[self.position:self.position+2]], 0)
+                self.next = Token(sym[self.source[self.position:self.position+2]], self.source[self.position:self.position+2])
                 self.position += 2
                 PARSING = 0
                          
@@ -52,7 +52,7 @@ class Tokenizer():
             while PARSING:        
                 if self.source[self.position+1] in nums+letters+["\n", " "]:
                     sinal = self.source[start_positon:self.position+1].replace(" ", "")
-                    self.next = Token(sym[sinal], 0)
+                    self.next = Token(sym[sinal], sinal)
                     PARSING = 0
                 
        
@@ -63,11 +63,14 @@ class Tokenizer():
                         raise Exception("Space between symbols")
                     elif (sinal2[0] == "*" or sinal2[0] == "/") and (sinal2[-1] == "*" or sinal2[-1] == "/"):
                         raise Exception("Too Many symbols")
-                    
-                    sinal = sinal.replace(" ", "")
-                    self.next = Token(sym[sinal], 0)
 
-                    PARSING = 0
+                    else:                   
+                        sinal = sinal.replace(" ", "")
+                        self.next = Token(sym[sinal], sinal)
+
+                        PARSING = 0
+                    
+
 
                 self.position += 1 
         
@@ -75,7 +78,7 @@ class Tokenizer():
             PARSING = 1
             while PARSING:
                 self.position += 1
-                if self.source[self.position] in list(sym.keys())+[" "] or self.source[self.position:self.position+1] == "\n":
+                if self.source[self.position] in list(sym.keys())+[" "] or self.source[self.position:self.position+1] == "\n" or self.source[self.position:self.position+2] in list(sym.keys()):
                     value = self.source[start_positon:self.position].strip()
                     if " " in value:
                         raise Exception("Variavel invalida")
@@ -85,7 +88,13 @@ class Tokenizer():
                         self.next = Token(reserved[value], value)
 
                     PARSING = 0 
-                
+           
+                elif self.source[self.position:self.position+2] in list(sym.keys()):
+                    if not " " in self.source[start_positon:self.position+2]:
+                        self.next = Token(sym[self.source[self.position:self.position+2]], self.source[self.position:self.position+2])
+                        self.position += 1
+                        PARSING = 0 
+             
         elif self.source[self.position:self.position+1] == "\n":
             PARSING = 1
             if self.position+1 >= len(self.source):
@@ -95,13 +104,13 @@ class Tokenizer():
                 self.position += 1
                 
             while PARSING:                    
-                self.position += 1
                 if self.source[self.position] in letters+["\n"]:
                     value = self.source[start_positon:self.position]
                     if " " in value.strip():
                         raise Exception("Variavel invalida")
                     self.next = Token("LB", value.strip())
                     PARSING = 0 
+                self.position += 1
 
         else:
             self.position += 1

@@ -12,17 +12,7 @@ class Node(ABC):
 
 class BinOp(Node):
     def Evaluate(self):
-        if self.children[0].Evaluate()[0] != self.children[1].Evaluate()[0]:
-            raise Exception("BinOP precisa que"+self.children[1].Evaluate()[0]+"="+self.children[0].Evaluate()[0])
-        if self.value == "-":
-            res = self.children[1].Evaluate()[1]-self.children[0].Evaluate()[1]
-        elif self.value == "+":
-            res = self.children[1].Evaluate()[1]+self.children[0].Evaluate()[1]
-        elif self.value == "*":
-            res = self.children[1].Evaluate()[1]*self.children[0].Evaluate()[1]
-        elif self.value == "/":
-            res = self.children[1].Evaluate()[1]/self.children[0].Evaluate()[1]
-        elif self.value == "==":
+        if self.value == "==":
             res = self.children[1].Evaluate()[1] == self.children[0].Evaluate()[1]
         elif self.value == ">":
             res = self.children[1].Evaluate()[1]>self.children[0].Evaluate()[1]
@@ -31,7 +21,18 @@ class BinOp(Node):
         elif self.value == "||":
             res = self.children[1].Evaluate()[1] or self.children[0].Evaluate()[1]
         elif self.value == "&&":
-            res = self.children[1].Evaluate()[1] and self.children[0].Evaluate()[1]
+            res = self.children[1].Evaluate()[1] and self.children[0].Evaluate()[1]  
+        elif self.children[0].Evaluate()[0] != self.children[1].Evaluate()[0]:
+            raise Exception("BinOP precisa que"+self.children[1].Evaluate()[0]+"="+self.children[0].Evaluate()[0])
+        elif self.value == "-":
+            res = self.children[1].Evaluate()[1]-self.children[0].Evaluate()[1]
+        elif self.value == "+":
+            res = self.children[1].Evaluate()[1]+self.children[0].Evaluate()[1]
+        elif self.value == "*":
+            res = self.children[1].Evaluate()[1]*self.children[0].Evaluate()[1]
+        elif self.value == "/":
+            res = self.children[1].Evaluate()[1]/self.children[0].Evaluate()[1]
+
         return ("Int", int(res))
 
 class UnOp(Node):

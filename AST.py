@@ -39,16 +39,11 @@ class UnOp(Node):
         if self.children.Evaluate()[0] != "Int":
             raise Exception("UnOP não aceita"+self.children.Evaluate()[0])
         if self.value == "-":
-            return ("Int", -self.children.Evaluate())
+            return ("Int", -self.children.Evaluate()[1])
         if self.value == "+":
-            return ("Int", self.children.Evaluate())
+            return ("Int", self.children.Evaluate()[1])
         if self.value == "!":
-            resultado=1
-            count=1
-            while count <= self.children.Evaluate():
-                resultado *= count
-                count += 1
-            return ("Int", resultado)
+            return ("Int", not self.children.Evaluate()[1])
 
 class ConcatOp(Node):
     def Evaluate(self):
@@ -89,7 +84,7 @@ class Read(Node):
     
 class While(Node):
     def Evaluate(self):
-        while self.children[1].Evaluate():
+        while self.children[1].Evaluate()[1]:
             self.children[0].Evaluate()
 
 class If(Node):

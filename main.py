@@ -241,6 +241,15 @@ def comments(arg):
     return arg
 
 if __name__ == "__main__":
-    with open(sys.argv[1], "r") as f: 
+    with open(sys.argv[1], "r") as f:
         res = Parser.run(f.read())
-        res = res.Evaluate()
+        
+    with open(sys.argv[1].split(".")[0].split("/")[-1]+".asm", "w") as asm:
+        with open("asm/cabecalho.asm", "r") as cab:
+            asm.write(cab.read())
+    
+    res = res.Evaluate()
+
+    with open(sys.argv[1].split(".")[0].split("/")[-1]+".asm", "w") as asm:
+        with open("asm/rodape.asm", "r") as rod:
+            asm.write(rod.read())

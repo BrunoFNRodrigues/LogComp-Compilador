@@ -12,3 +12,9 @@ Compilador para matéria lógica da computação
 ---
 ## Roteiro 5
 ![alt text](img/roteiro5.png "Diagrama Sintatico")
+---
+## Roteiro 6
+![alt text](img/roteiro6.png "Diagrama Sintatico")
+---
+## Roteiro 7
+![alt text](img/roteiro7.png "Diagrama Sintatico")

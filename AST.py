@@ -1,39 +1,86 @@
 from abc import ABC, abstractmethod
 from SymbolTable import SymbolTable
 
+class Assembler():
+    file = ""
+
+    def write(string):
+        with open(Assembler.file, "a") as f:
+            f.write(string+"\n")
+
 class Node(ABC):
+    i = 0
+    
     def __init__(self, value=0, children=[]):
         self.value = value
         self.children = children
+        self.id = Node.newId()
+        Node.i += 1
 
     @abstractmethod
     def Evaluate(self):
         None
+        
+    @staticmethod
+    def newId():
+        return Node.i 
 
 class BinOp(Node):
     def Evaluate(self):
+        id = str(self.id)
+        self.children[1].Evaluate()
+        Assembler.write("PUSH EBX ;")
+        self.children[0].Evaluate()
+        Assembler.write("POP EAX ;")
+        
         if self.value == "==":
-            res = self.children[1].Evaluate()[1] == self.children[0].Evaluate()[1]
+            Assembler.write("CMP EAX, EBX ;")
+            Assembler.write("JE IGUAL"+id+" ;")
+            Assembler.write("MOV EBX, 0 ;")
+            Assembler.write("JMP FIM"+id+" ;")
+            Assembler.write("IGUAL"+id+":")
+            Assembler.write("MOV EBX, 1 ;")
+            Assembler.write("FIM"+id+":")
+            
         elif self.value == ">":
-            res = self.children[1].Evaluate()[1]>self.children[0].Evaluate()[1]
+            Assembler.write("CMP EAX, EBX ;")
+            Assembler.write("JG MAIOR"+id+" ;")
+            Assembler.write("MOV EBX, 0 ;")
+            Assembler.write("JMP FIM"+id+" ;")
+            Assembler.write("MAIOR"+id+":")
+            Assembler.write("MOV EBX, 1 ;")
+            Assembler.write("FIM"+id+":")
+            
         elif self.value == "<":
-            res = self.children[1].Evaluate()[1]<self.children[0].Evaluate()[1]
+            Assembler.write("CMP EAX, EBX ;")
+            Assembler.write("JL MENOR"+id+" ;")
+            Assembler.write("MOV EBX, 0 ;")
+            Assembler.write("JMP FIM"+id+" ;")
+            Assembler.write("MENOR"+id+":")
+            Assembler.write("MOV EBX, 1 ;")
+            Assembler.write("FIM"+id+":")
+            
         elif self.value == "||":
-            res = self.children[1].Evaluate()[1] or self.children[0].Evaluate()[1]
-        elif self.value == "&&":
-            res = self.children[1].Evaluate()[1] and self.children[0].Evaluate()[1]  
-        elif self.children[0].Evaluate()[0] != self.children[1].Evaluate()[0]:
-            raise Exception("BinOP precisa que"+self.children[1].Evaluate()[0]+"="+self.children[0].Evaluate()[0])
-        elif self.value == "-":
-            res = self.children[1].Evaluate()[1]-self.children[0].Evaluate()[1]
-        elif self.value == "+":
-            res = self.children[1].Evaluate()[1]+self.children[0].Evaluate()[1]
-        elif self.value == "*":
-            res = self.children[1].Evaluate()[1]*self.children[0].Evaluate()[1]
-        elif self.value == "/":
-            res = self.children[1].Evaluate()[1]/self.children[0].Evaluate()[1]
+            Assembler.write("OR EAX, EBX ;")
 
-        return ("Int", int(res))
+        elif self.value == "&&":
+            Assembler.write("AND EAX, EBX ;")
+      
+        elif self.value == "-":
+            Assembler.write("SUB EAX, EBX ;")
+
+        elif self.value == "+":
+            Assembler.write("ADD EAX, EBX ;")
+
+        elif self.value == "*":
+            Assembler.write("IMUL EBX ;")
+
+        elif self.value == "/":
+            Assembler.write("DIV EBX ;")
+
+        return None
+
+        
 
 class UnOp(Node):
     def Evaluate(self):
@@ -52,7 +99,9 @@ class ConcatOp(Node):
 
 class IntVal(Node):
     def Evaluate(self):
-        return ("Int", self.value)
+        Assembler.write("MOV EBX, "+str(self.value)+" ;")
+        return None
+    
 
 class StringVal(Node):
     def Evaluate(self):
@@ -73,7 +122,7 @@ class Block(Node):
 
 class Print(Node):
     def Evaluate(self):
-            print(self.children.Evaluate()[1])
+            print(self.children.Evaluate())
 
 class Assignment(Node):
     def Evaluate(self):

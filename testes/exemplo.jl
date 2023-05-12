@@ -1,3 +1,3 @@
-a::String = "testes"
-b::Int = 10
+println(5 > 10 == 10 < 5)
+
 

@@ -1,4 +1,5 @@
 import sys
+import os
 from AST import *
 from Tokenizer import *
 import string
@@ -89,7 +90,7 @@ class Parser():
                     return res    
         
         else:
-            raise Exception("Bad Statement"+ Parser.tokenizer.next.type)
+            raise Exception("Bad Statement: "+ Parser.tokenizer.next.type)
                         
     def parseFactor():
         if Parser.tokenizer.next.type != "CP":
@@ -244,12 +245,12 @@ if __name__ == "__main__":
     with open(sys.argv[1], "r") as f:
         res = Parser.run(f.read())
         
-    with open(sys.argv[1].split(".")[0].split("/")[-1]+".asm", "w") as asm:
-        with open("asm/cabecalho.asm", "r") as cab:
+    with open(os.path.basename(sys.argv[1]).split(".")[0]+".asm", "w") as asm:
+        with open("./asm/cabecalho.asm", "r") as cab:
             asm.write(cab.read())
-    
+    Assembler.file = os.path.basename(sys.argv[1]).split(".")[0]+".asm"
     res = res.Evaluate()
 
-    with open(sys.argv[1].split(".")[0].split("/")[-1]+".asm", "w") as asm:
-        with open("asm/rodape.asm", "r") as rod:
+    with open(os.path.basename(sys.argv[1]).split(".")[0]+".asm", "a") as asm:
+        with open("./asm/rodape.asm", "r") as rod:
             asm.write(rod.read())

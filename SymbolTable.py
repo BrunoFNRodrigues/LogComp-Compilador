@@ -1,6 +1,6 @@
 
 class SymbolTable():
-    table = {}
+    table = {"0":0}
     reserved = ["println", "readline", "while", "if", "else"]
         
     def Getter(key):

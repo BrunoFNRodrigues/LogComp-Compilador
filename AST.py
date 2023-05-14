@@ -33,51 +33,42 @@ class BinOp(Node):
         self.children[0].Evaluate()
         Assembler.write("POP EAX ;")
         
-        if self.value == "==":
+        if self.value == "==":  
             Assembler.write("CMP EAX, EBX ;")
-            Assembler.write("JE IGUAL"+id+" ;")
-            Assembler.write("MOV EBX, 0 ;")
-            Assembler.write("JMP FIM"+id+" ;")
-            Assembler.write("IGUAL"+id+":")
-            Assembler.write("MOV EBX, 1 ;")
-            Assembler.write("FIM"+id+":")
+            Assembler.write("CALL binop_je ;")
             
         elif self.value == ">":
             Assembler.write("CMP EAX, EBX ;")
-            Assembler.write("JG MAIOR"+id+" ;")
-            Assembler.write("MOV EBX, 0 ;")
-            Assembler.write("JMP FIM"+id+" ;")
-            Assembler.write("MAIOR"+id+":")
-            Assembler.write("MOV EBX, 1 ;")
-            Assembler.write("FIM"+id+":")
+            Assembler.write("CALL binop_jg ;")
             
         elif self.value == "<":
             Assembler.write("CMP EAX, EBX ;")
-            Assembler.write("JL MENOR"+id+" ;")
-            Assembler.write("MOV EBX, 0 ;")
-            Assembler.write("JMP FIM"+id+" ;")
-            Assembler.write("MENOR"+id+":")
-            Assembler.write("MOV EBX, 1 ;")
-            Assembler.write("FIM"+id+":")
+            Assembler.write("CALL binop_jl ;")
             
         elif self.value == "||":
             Assembler.write("OR EAX, EBX ;")
+            Assembler.write("MOV EBX, EAX ;")
 
         elif self.value == "&&":
             Assembler.write("AND EAX, EBX ;")
+            Assembler.write("MOV EBX, EAX ;")
       
         elif self.value == "-":
             Assembler.write("SUB EAX, EBX ;")
+            Assembler.write("MOV EBX, EAX ;")
 
         elif self.value == "+":
             Assembler.write("ADD EAX, EBX ;")
+            Assembler.write("MOV EBX, EAX ;")
 
         elif self.value == "*":
             Assembler.write("IMUL EBX ;")
+            Assembler.write("MOV EBX, EAX ;")
 
         elif self.value == "/":
             Assembler.write("DIV EBX ;")
-
+            Assembler.write("MOV EBX, EAX ;")
+            
         return None
 
         
@@ -113,7 +104,7 @@ class NoOp(Node):
 
 class Identifier(Node):
     def Evaluate(self):
-        return SymbolTable.Getter(self.value)
+        Assembler.write("MOV EBX, [EBP-"+str(SymbolTable.table[self.value])+"] ;")
     
 class Block(Node):
     def Evaluate(self):
@@ -122,11 +113,21 @@ class Block(Node):
 
 class Print(Node):
     def Evaluate(self):
-            print(self.children.Evaluate())
+        self.children.Evaluate()
+        Assembler.write("PUSH EBX ;")
+        Assembler.write("CALL print ;")
+        Assembler.write("POP EBX ;")
 
 class Assignment(Node):
     def Evaluate(self):
-        SymbolTable.Setter(self.children[0].value, self.children[1].Evaluate())
+        key = self.children[0].value
+        if key in SymbolTable.table.keys():
+            self.children[1].Evaluate()
+            Assembler.write("MOV [EBP-"+str(SymbolTable.table[key])+"], EBX;")
+        else:
+            Assembler.write("PUSH DWORD 0 ;")
+            Desloc = max(SymbolTable.table.values()) + 4
+            SymbolTable.table[self.children[0].value] = Desloc
     
 class Read(Node):
     def Evaluate(self):
@@ -134,23 +135,32 @@ class Read(Node):
     
 class While(Node):
     def Evaluate(self):
-        while self.children[1].Evaluate()[1]:
-            self.children[0].Evaluate()
+        id = str(self.id)
+        Assembler.write("LOOP_"+id+": ; ")
+        self.children[1].Evaluate()
+        Assembler.write("CMP EBX, False ;")
+        Assembler.write("JE EXIT_"+id+" ; ")
+        self.children[0].Evaluate()
+        Assembler.write("JMP LOOP_"+id+" ;")
+        Assembler.write("EXIT_"+id+":")
+        
 
 class If(Node):
     def Evaluate(self):
-        if self.children[-1].Evaluate():
-            self.children[-2].Evaluate()
-        elif len(self.children) > 2:
+        id = str(self.id)
+        Assembler.write("IF_"+id+": ; ")
+        self.children[-1].Evaluate()
+        Assembler.write("CMP EBX, False ;")
+        Assembler.write("JE ELSE_"+id+" ; ")
+        self.children[-2].Evaluate()
+        Assembler.write("ELSE_"+id+":")
+        if len(self.children) > 2:
             self.children[0].Evaluate()
 
 class VarDec(Node):
     def Evaluate(self):
-        if len(self.children) <= 1:
-            if self.value == "Int":
-                SymbolTable.Create(self.children[0].value,["Int", 0])
-            elif self.value == "String":
-                SymbolTable.Create(self.children[0].value, ["String", ""])
-        else:
-            SymbolTable.Create(self.children[0].value, self.children[1].Evaluate())
+        Assembler.write("PUSH DWORD 0 ;")
+        Desloc = max(SymbolTable.table.values()) + 4
+        SymbolTable.table[self.children[0].value] = Desloc
+
         

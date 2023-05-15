@@ -46,6 +46,14 @@ class Parser():
                 elif Parser.tokenizer.next.type == "LB":
                     res = VarDec(t, [res])
                     return res
+            elif Parser.tokenizer.next.type == "OP":
+                Parser.tokenizer.selectNext()
+                args = [res]
+                if Parser.tokenizer.next.type != "CP":
+                    args.append(Parser.parseRelExpression())
+                    while Parser.tokenizer.next.type == "COMA":
+                        args.append(Parser.parseRelExpression())
+                #res = FuncCall()
         
         elif Parser.tokenizer.next.type == "PNT":
             Parser.tokenizer.selectNext()
@@ -216,7 +224,7 @@ class Parser():
         return res
 
 def lexicon(arg):
-    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n", "_", "|", "&", "<", ">", "!", ".", ":", '"'] + list(string.ascii_letters)
+    alfabeto = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "*", "/", " ", "(", ")", "=", "\n", "_", "|", "&", "<", ">", "!", ".", ":", '"', ","] + list(string.ascii_letters)
     if len(arg) == 0:
         raise Exception("No Argument")
     for i in arg:

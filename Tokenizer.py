@@ -13,10 +13,11 @@ class Tokenizer():
     def selectNext(self):
         nums = ["0","1","2","3","4","5","6","7","8","9"]
         sym = {"+":"POS", "-":"NEG", "/":"DIV", 
-               "*":"MULT", "(":"OP", ")":"CP",
+               "*":"MULT", "(":"OP", ")":"CP", ",":"COMA",
                "||":"OR", "&&":"AND", "=": "EQL", "==":"SEQL",
                ">":"GRT", "<":"LST", "!" : "FTR", ".":"CONCAT", "::":"TYPO", '"':"COT"}
-        reserved = {"println":"PNT", "readline":"RD", "while":"WHL", "if":"IF", "else":"ELSE", "end":"END", "String":"STR", "Int":"INT"}
+        reserved = {"println":"PNT", "readline":"RD", "while":"WHL", "if":"IF", "else":"ELSE", "end":"END", "String":"STR",
+                     "Int":"INT", "function":"FUNC", "return":"RET"}
         letters= list(string.ascii_letters)
         start_positon = self.position
         if start_positon == len(self.source):
@@ -50,7 +51,7 @@ class Tokenizer():
         elif self.source[self.position] in list(sym.keys()):
             PARSING = 1
             while PARSING:        
-                if self.source[self.position+1] in nums+letters+["\n", " "]:
+                if self.source[self.position+1] in nums+letters+["\n", " ", ":"]:
                     sinal = self.source[start_positon:self.position+1].replace(" ", "")
                     self.next = Token(sym[sinal], sinal)
                     PARSING = 0

@@ -1,22 +1,24 @@
 
 class SymbolTable():
-    table = {}
     reserved = ["println", "readline", "while", "if", "else"]
         
-    def Getter(key):
+    def __init__(self):
+        self.table = {}
+        
+    def Getter(self, key):
         if key in SymbolTable.reserved:
             raise Exception("Palavra reservada")
-        if key in SymbolTable.table.keys():
-            return SymbolTable.table[key]
+        if key in self.table.keys():
+            return self.table[key]
     
-    def Setter(key, value):
-        if value[0] != SymbolTable.table[key][0]:
-            raise Exception("Tipo não combina: "+value[0]+"!="+SymbolTable.table[key][0]) 
-        SymbolTable.table[key] = value
+    def Setter(self, key, value):
+        if value[0] != self.table[key][0]:
+            raise Exception("Tipo não combina: "+value[0]+"!="+self.table[key][0]) 
+        self.table[key] = value
 
-    def Create(key, value):
-        if key in SymbolTable.table.keys():
+    def Create(self, key, value):
+        if key in self.table.keys():
             raise Exception("Variavel já existe")
         else:
-            SymbolTable.table[key] = value
+            self.table[key] = value
 

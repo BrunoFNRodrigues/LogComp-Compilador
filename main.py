@@ -2,6 +2,7 @@ import sys
 from AST import *
 from Tokenizer import *
 import string
+from SymbolTable import *
 
 class Parser():
     tokenizer = None
@@ -18,7 +19,7 @@ class Parser():
     def parseBlock():
         Parser.tokenizer.selectNext()
         statements = []
-        while Parser.tokenizer.next.type in ["IDT", "LB", "PNT", "WHL", "IF"]:
+        while Parser.tokenizer.next.type in ["IDT", "LB", "PNT", "WHL", "IF", "RET", "FUNC"]:
             statements.append(Parser.parseStatement())
             Parser.tokenizer.selectNext()
         return Block(children=statements)
@@ -52,9 +53,14 @@ class Parser():
                 if Parser.tokenizer.next.type != "CP":
                     args.append(Parser.parseRelExpression())
                     while Parser.tokenizer.next.type == "COMA":
+                        Parser.tokenizer.selectNext()
                         args.append(Parser.parseRelExpression())
-                #res = FuncCall()
-        
+                res = FuncCall(args[0], args[1:])
+                if  Parser.tokenizer.next.type == "CP":
+                    Parser.tokenizer.selectNext()
+                    if  Parser.tokenizer.next.type == "LB":
+                        return res 
+                         
         elif Parser.tokenizer.next.type == "PNT":
             Parser.tokenizer.selectNext()
             if Parser.tokenizer.next.type == "OP":
@@ -96,16 +102,66 @@ class Parser():
                 if Parser.tokenizer.next.type == "LB":
                     return res    
         
+        elif Parser.tokenizer.next.type == "RET":
+            Parser.tokenizer.selectNext()
+            res = Return(children=Parser.parseRelExpression())
+            if Parser.tokenizer.next.type == "LB":
+                return res
+            
+        elif Parser.tokenizer.next.type == "FUNC":
+            Parser.tokenizer.selectNext()
+            if Parser.tokenizer.next.type == "IDT":
+                iden  = Identifier(Parser.tokenizer.next.value)
+                args = []
+                Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "OP":
+                    while Parser.tokenizer.next.type != "CP":
+                        Parser.tokenizer.selectNext()
+                        if Parser.tokenizer.next.type == "IDT":
+                            res = Identifier(Parser.tokenizer.next.value)
+                            Parser.tokenizer.selectNext()
+                            if Parser.tokenizer.next.type == "TYPO":
+                                Parser.tokenizer.selectNext()
+                                t =  Parser.tokenizer.next.value
+                                args.append(VarDec(t, [res]))
+                                Parser.tokenizer.selectNext()
+                                if not Parser.tokenizer.next.type in ["COMA", "CP"]:
+                                    raise Exception("Declarou errado a func")
+                    Parser.tokenizer.selectNext()
+                    if Parser.tokenizer.next.type == "TYPO":
+                        Parser.tokenizer.selectNext()
+                        t =  Parser.tokenizer.next.value
+                        Parser.tokenizer.selectNext()
+                        if Parser.tokenizer.next.type == "LB":
+                            res = FuncDec(t, [iden, args, Parser.parseBlock()])
+                            if Parser.tokenizer.next.type == "END":
+                                Parser.tokenizer.selectNext()
+                                if Parser.tokenizer.next.type == "LB":
+                                    return res   
+        
         else:
-            raise Exception("Bad Statement"+ Parser.tokenizer.next.type)
+            raise Exception("Bad Statement: "+ Parser.tokenizer.next.type + " " + str(Parser.tokenizer.next.value))
                         
     def parseFactor():
         if Parser.tokenizer.next.type != "CP":
             res = 0
             if Parser.tokenizer.next.type == "INT":
                 res = IntVal(Parser.tokenizer.next.value, [])
+                Parser.tokenizer.selectNext()
             elif Parser.tokenizer.next.type == "IDT":
                 res = Identifier(Parser.tokenizer.next.value)
+                Parser.tokenizer.selectNext()
+                if Parser.tokenizer.next.type == "OP":
+                    Parser.tokenizer.selectNext()
+                    args = [res]
+                    if Parser.tokenizer.next.type != "CP":
+                        args.append(Parser.parseRelExpression())
+                        while Parser.tokenizer.next.type == "COMA":
+                            Parser.tokenizer.selectNext()
+                            args.append(Parser.parseRelExpression())
+                    if  Parser.tokenizer.next.type == "CP":
+                        Parser.tokenizer.selectNext()
+                        res = FuncCall(args[0], args[1:])                
             elif Parser.tokenizer.next.type == "POS":
                 Parser.tokenizer.selectNext()
                 res = UnOp("+", Parser.parseFactor())
@@ -140,7 +196,6 @@ class Parser():
 
     def parseTerm():
         res = Parser.parseFactor()
-        Parser.tokenizer.selectNext()
         while Parser.tokenizer.next.type == "MULT" or Parser.tokenizer.next.type == "DIV" or Parser.tokenizer.next.type == "AND":
             if Parser.tokenizer.next.type == "MULT":
                 Parser.tokenizer.selectNext()
@@ -251,4 +306,4 @@ def comments(arg):
 if __name__ == "__main__":
     with open(sys.argv[1], "r") as f: 
         res = Parser.run(f.read())
-        res = res.Evaluate()
+        res = res.Evaluate(SymbolTable())

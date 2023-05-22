@@ -170,12 +170,13 @@ class Parser():
                 res = UnOp("-", Parser.parseFactor())
             elif Parser.tokenizer.next.type == "FTR":
                 Parser.tokenizer.selectNext()
-                res = UnOp("!", Parser.parseFactor())   
+                res = UnOp("!", Parser.parseFactor())  
             elif Parser.tokenizer.next.type == "OP":
                 Parser.tokenizer.selectNext()
                 res = Parser.parseRelExpression()
                 if Parser.tokenizer.next.type != "CP":
                     raise Exception("Faltou fechar")
+                Parser.tokenizer.selectNext()
             elif Parser.tokenizer.next.type == "RD":
                 res = Read()
                 Parser.tokenizer.selectNext()
@@ -183,12 +184,14 @@ class Parser():
                     Parser.tokenizer.selectNext()
                     if Parser.tokenizer.next.type != "CP":
                         raise Exception("Faltou fechar parenteses")
+                    Parser.tokenizer.selectNext()
             elif Parser.tokenizer.next.type == "COT":
                 Parser.tokenizer.selectNext()
                 res = StringVal(Parser.tokenizer.next.value, [])
                 Parser.tokenizer.selectNext()
                 if Parser.tokenizer.next.type != "COT":
                     raise Exception("Faltou fechar aspas")
+                Parser.tokenizer.selectNext()
 
             return res
         else:
@@ -215,7 +218,6 @@ class Parser():
                     raise Exception("&& no fim")
                 res = BinOp("&&", [Parser.parseFactor(), res])
                 
-            Parser.tokenizer.selectNext()
         return res
                     
     def parseExpression():
